@@ -1,0 +1,157 @@
+{% extends 'app/layout.html.twig' %}
+
+{% block title %}Server management{% endblock %}
+
+{% block content %}
+    <div class="heading">
+        <i class="mdi mdi-server"></i><span>Servers</span>
+    </div>
+
+    <div class="row content-row">
+        <div class="col-md-8">
+            <div class="trackr-card">
+                <div class="trackr-card-content">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addServerModal"
+                            style="margin-bottom: 15px"><span>Add server <i class="mdi mdi-plus"></i></span></button>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Server name</th>
+                            <th scope="col">Tracking URL <i class="mdi mdi-help-box" data-container="body" data-trigger="hover"  data-html="true"
+                                                           data-toggle="popover" data-placement="top"
+                                                           data-content="You should put it in <b>sv_loadingurl</b> to make Trackr work"></i></th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if servers is empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center">You don't have server. <a href="#" data-toggle="modal" data-target="#addServerModal">Add new
+                                        one</a></td>
+                            </tr>
+                        {% else %}
+                            {% for server in servers %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{ server.getName() }}</td>
+                                    <td><a href="{{ url('gate', {id: server.getHash()}) }}">{{ url('gate', {id: server.getHash()}) }}</a></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editServerModal_{{ loop.index }}" ><span><i class="mdi mdi-lead-pencil"></i></span></button>
+                                        <button class="btn btn-danger btn-sm" data-container="body" data-trigger="hover"
+                                                data-toggle="popover" data-placement="right"
+                                                data-content="Delete server" onclick="if(confirm('Do you really want to delete this server?')) {location.href = '{{ path('server_delete', {id: server.getId()}) }}'}"><span><i class="mdi mdi-trash-can-outline"></i></span></button></a>
+                                    </td>
+                                </tr>
+
+                                <div class="modal fade" id="editServerModal_{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="editServerModalLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <form action="{{ path('server_edit', {id: server.getId()}) }}" method="post" id="server_add_form">
+
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editServerModalLabel">Editing server</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="server_name">Server name<sup style="color:red">*</sup></label>
+                                                        <input id="server_name" type="text" placeholder="Enter your server`s name"
+                                                               name="server_name" value="{{ server.getName() }}" class="form-control" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="server_name">Loading screen URL<sup style="color:red">*</sup></label>
+                                                        <input id="server_name" type="text" placeholder="Enter your loading screen`s url"
+                                                               name="loading_url" value="{{ server.getLoadingUrl() }}" class="form-control" required/>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>Close</span></button>
+                                                    <button class="btn btn-primary" type="submit"><span>Save changes</span></button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trackr-card">
+                <div class="trackr-card-heading">
+                    <i class="mdi mdi-lifebuoy"></i><span>Help</span>
+                </div>
+                <div class="row-separator">
+                    <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="20%" height="30"
+                         viewBox="0 0 100 102" preserveAspectRatio="none">
+                        <path d="M0 0 L50 100 L100 0 Z"/>
+                    </svg>
+                </div>
+
+                <div class="trackr-card-content text-secondary">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut consectetur dui, elementum
+                        consectetur urna. Maecenas vehicula ex velit, nec gravida lacus iaculis a. Mauris eget suscipit
+                        velit. Phasellus malesuada blandit dolor, nec suscipit tellus consequat at. Mauris vitae
+                        sollicitudin libero. Aliquam in velit ut nibh ullamcorper suscipit. Maecenas laoreet viverra
+                        dui, eget hendrerit ipsum vulputate sed. Donec lacinia ex arcu, at blandit sem mollis sed.
+                        Pellentesque sagittis suscipit posuere. Interdum et malesuada fames ac ante ipsum primis in
+                        faucibus. Vivamus erat urna, feugiat id ante sit amet, aliquam elementum sem. Morbi et dolor
+                        enim.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut consectetur dui, elementum
+                        consectetur urna. Maecenas vehicula ex velit, nec gravida lacus iaculis a. Mauris eget suscipit
+                        velit. Phasellus malesuada blandit dolor, nec suscipit tellus consequat at. Mauris vitae
+                        sollicitudin libero. Aliquam in velit ut nibh ullamcorper suscipit. Maecenas laoreet viverra
+                        dui, eget hendrerit ipsum vulputate sed. Donec lacinia ex arcu, at blandit sem mollis sed.
+                        Pellentesque sagittis suscipit posuere. Interdum et malesuada fames ac ante ipsum primis in
+                        faucibus. Vivamus erat urna, feugiat id ante sit amet, aliquam elementum sem. Morbi et dolor
+                        enim.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addServerModal" tabindex="-1" role="dialog" aria-labelledby="addServerModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ path('server_add') }}" method="post" id="server_add_form">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addServerModalLabel">Adding new server</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="server_name">Server name<sup style="color:red">*</sup></label>
+                            <input id="server_name" type="text" placeholder="Enter your server`s name"
+                                   name="server_name" class="form-control" required/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="server_name">Loading screen URL<sup style="color:red">*</sup></label>
+                            <input id="server_name" type="text" placeholder="Enter your loading screen`s url"
+                                   name="loading_url" class="form-control" required/>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>Close</span></button>
+                        <button class="btn btn-primary" type="submit"><span>Add server</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

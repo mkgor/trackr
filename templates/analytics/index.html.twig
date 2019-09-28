@@ -1,0 +1,99 @@
+{% extends 'app/layout.html.twig' %}
+
+{% block title %}Analytics (beta){% endblock %}
+
+{% block content %}
+    <div class="heading">
+        <i class="mdi mdi-home-analytics"></i><span>Analytics <sup>β</sup></span>
+    </div>
+
+    <div class="row content-row">
+        <div class="col-md-6">
+            <div class="trackr-card">
+                <div class="trackr-card-content">
+                    <form class="form-inline">
+                        <label for="by_year" style="margin-right:10px;">Year: </label>
+
+                        <select id="by_year" name="by_year" class="form-control">
+                            <option>2019</option>
+                        </select>
+
+                        <label for="by_month" style="margin-left:40px; margin-right:10px;">Month: </label>
+
+                        <select id="by_month" name="by_year" class="form-control">
+                            <option>Not specified</option>
+                            <option>January</option>
+                            <option>FEB</option>
+                        </select>
+                    </form>
+                    <canvas class="chart" id="chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="trackr-card">
+                <div class="trackr-card-content">
+                    <form class="form-inline">
+                        <label for="by_year_2" style="margin-right:10px;">Year: </label>
+
+                        <select id="by_year_2" name="by_year" class="form-control">
+                            <option>2019</option>
+                        </select>
+
+                        <label for="by_month_2" style="margin-left:40px; margin-right:10px;">Month: </label>
+
+                        <select id="by_month_2" name="by_year" class="form-control">
+                            <option>Not specified</option>
+                            <option>January</option>
+                            <option>FEB</option>
+                        </select>
+                    </form>
+                    <canvas class="chart" id="chart2"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script type="text/javascript">
+        new Chart(document.getElementById("chart"), {
+            "type": "line",
+            "data": {
+                "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                "datasets": [{
+                    "label": "Total visits",
+                    "data": [65, 59, 80, 81, 56, 55, 40],
+                    "fill": false,
+                    "borderColor": "#1C5FCC",
+                    "fillColor": "#1C5FCC",
+                    "lineTension": 0.2
+                }]
+            },
+            "options": {}
+        });
+
+        new Chart(document.getElementById("chart2"), {
+            "type": "line",
+            "data": {
+                "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                "datasets": [{
+                    "label": "Total visits",
+                    "data": [65, 59, 80, 81, 56, 55, 40],
+                    "fill": false,
+                    "borderColor": "rgb(75, 192, 192)",
+                    "lineTension": 0.1
+                }]
+            },
+            "options": {}
+        });
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.css" />
+{% endblock %}
+

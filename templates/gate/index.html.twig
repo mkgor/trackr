@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta HTTP-EQUIV="Expires" CONTENT="0">
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        function GameDetails( servername, serverurl, mapname, maxplayers, steamid, gamemode ) {
+            $.ajax({
+                url: '{{ path('api_handle_visit') }}',
+                method: 'POST',
+                data: {
+                    steamid: steamid,
+                    server_id: {{ server_id }}
+                },
+                success: () => {
+                    location.href = '{{ loading_link|url_filter }}'
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<script>
+    GameDetails(null,null,null,null,76561297960248400,null);
+</script>
+</body>
+</html>
