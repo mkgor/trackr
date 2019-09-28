@@ -3,11 +3,14 @@
 namespace App\Service;
 
 use App\Entity\Visit;
+use App\Repository\VisitRepository;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Class ActivityCounterService
+ *
  * @package App\Service
  */
 class ActivityCounterService
@@ -18,7 +21,7 @@ class ActivityCounterService
     private $em;
 
     /**
-     * @var \App\Repository\VisitRepository|\Doctrine\Common\Persistence\ObjectRepository
+     * @var VisitRepository|ObjectRepository
      */
     private $visitsRepository;
 
@@ -44,8 +47,9 @@ class ActivityCounterService
 
     /**
      * ActivityCounterService constructor.
+     *
      * @param EntityManagerInterface $entityManager
-     * @param SessionInterface $session
+     * @param SessionInterface       $session
      */
     public function __construct(EntityManagerInterface $entityManager, SessionInterface $session)
     {
@@ -110,6 +114,9 @@ class ActivityCounterService
         return $this->getDifference($yesterdayVisitsCount, $this->uniqueToday);
     }
 
+    /**
+     * @return int
+     */
     public function getNew()
     {
         $visits = $this->em->createQuery('SELECT visit.steamid FROM App\Entity\Visit visit WHERE visit.server = ?1 AND visit.player_new = 1 AND visit.time >= CURRENT_DATE()')->setParameter(1, $this->activeServer);
@@ -118,6 +125,9 @@ class ActivityCounterService
         return $this->newToday = count($visits);
     }
 
+    /**
+     * @return float|int|string
+     */
     public function getNewDifference()
     {
         if ($this->newToday == null) {

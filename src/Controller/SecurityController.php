@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class SecurityController
+ *
  * @package App\Controller
  */
 class SecurityController extends AbstractController
@@ -26,24 +27,27 @@ class SecurityController extends AbstractController
 
     /**
      * SecurityController constructor.
+     *
      * @param SteamAuthenticationService $authenticationService
+     *
      * @throws ErrorException
      */
     public function __construct(SteamAuthenticationService $authenticationService)
     {
-        $this->openid = new LightOpenID('http://'.$_SERVER['HTTP_HOST'] . '/login');
+        $this->openid = new LightOpenID('http://' . $_SERVER['HTTP_HOST'] . '/login');
         $this->steamAuthService = $authenticationService;
     }
 
     /**
      * @Route("/login", name="login")
      * @param Request $request
+     *
      * @return Response
      * @throws ErrorException
      */
     public function index(Request $request)
     {
-        if(!$this->openid->mode) {
+        if (!$this->openid->mode) {
             $this->openid->identity = 'http://steamcommunity.com/openid/?l=english';
 
             return $this->render('security/login.html.twig', [

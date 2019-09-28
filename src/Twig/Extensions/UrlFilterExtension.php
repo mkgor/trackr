@@ -12,7 +12,7 @@ use Twig\TwigFilter;
 class UrlFilterExtension extends AbstractExtension
 {
     /**
-     * @return array|\Twig\TwigFilter[]
+     * @return array|TwigFilter[]
      */
     public function getFilters()
     {

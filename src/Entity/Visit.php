@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VisitRepository")
@@ -49,7 +50,7 @@ class Visit
 
     /**
      * Visit constructor.
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {

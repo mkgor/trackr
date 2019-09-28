@@ -6,6 +6,7 @@ use App\Entity\Configuration;
 use App\Entity\Server;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use LightOpenID;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -47,11 +48,11 @@ class SteamAuthenticationService
     }
 
     /**
-     * @param \LightOpenID $openID
+     * @param LightOpenID $openID
      * @param Request $request
      * @return RedirectResponse
      */
-    public function authorize(\LightOpenID $openID, Request $request)
+    public function authorize(LightOpenID $openID, Request $request)
     {
         if($openID->mode == 'cancel') {
             return new RedirectResponse($this->generator->generate('login'));

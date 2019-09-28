@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Server;
 use App\Entity\Visit;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,7 @@ class ServerManagementController extends AbstractController
 
     /**
      * ServerManagementController constructor.
+     *
      * @param SessionInterface $session
      */
     public function __construct(SessionInterface $session, EntityManagerInterface $entityManager)
@@ -40,27 +42,28 @@ class ServerManagementController extends AbstractController
     public function index()
     {
         $servers = $this->getDoctrine()->getRepository(Server::class)->findBy([
-            'active' => 1
+            'active' => 1,
         ]);
 
         return $this->render('server_management/index.html.twig', [
-            'servers' => $servers,
+            'servers'   => $servers,
             'user_info' => $this->session->all(),
-            'active' => 'servers'
+            'active'    => 'servers',
         ]);
     }
 
     /**
      * @Route("/app/server/add", name="server_add")
      * @param Request $request
+     *
      * @return RedirectResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function addServer(Request $request)
     {
-        if(!empty($request->request->get('server_name')) && !empty($request->request->get('loading_url'))) {
+        if (!empty($request->request->get('server_name')) && !empty($request->request->get('loading_url'))) {
             $em = $this->getDoctrine()->getManager();
-            $hash = substr(md5(random_bytes(16)),0,16);
+            $hash = substr(md5(random_bytes(16)), 0, 16);
 
             $server = new Server();
             $server->setName($request->request->get('server_name'));
@@ -83,11 +86,12 @@ class ServerManagementController extends AbstractController
     /**
      * @Route("/app/server/set", name="server_set")
      * @param Request $request
+     *
      * @return RedirectResponse|Response
      */
     public function setServer(Request $request)
     {
-        if($request->query->has('id') && $request->query->has('backurl')) {
+        if ($request->query->has('id') && $request->query->has('backurl')) {
             $server = $this->getDoctrine()->getRepository(Server::class);
             $serverEntity = $server->find($request->query->get('id'));
 
@@ -104,17 +108,18 @@ class ServerManagementController extends AbstractController
     /**
      * @Route("/app/server/delete/{id}", name="server_delete")
      * @param int $id
+     *
      * @return RedirectResponse
      */
     public function deleteServer($id)
     {
         $server = $this->em->getRepository(Server::class)->find($id);
-        if(!empty($server)) {
+        if (!empty($server)) {
             $visit = $this->em->getRepository(Visit::class)->findBy([
-                'server' => $server->getId()
+                'server' => $server->getId(),
             ]);
 
-            if(empty($visit)) {
+            if (empty($visit)) {
                 $this->em->remove($server);
             } else {
                 $server->setActive(0);
@@ -133,12 +138,14 @@ class ServerManagementController extends AbstractController
 
     /**
      * @Route("/app/server/edit/{id}", name="server_edit")
-     * @param $id
+     * @param         $id
      * @param Request $request
+     *
      * @return RedirectResponse
      */
-    public function editServer($id, Request $request) {
-        if($request->request->has('server_name') && $request->request->has('loading_url')) {
+    public function editServer($id, Request $request)
+    {
+        if ($request->request->has('server_name') && $request->request->has('loading_url')) {
             $server = $this->em->getRepository(Server::class)->find($id);
 
             $server->setName($request->request->get('server_name'));

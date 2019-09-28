@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -58,7 +59,7 @@ class Player
         return $this->last_login->format('Y-m-d H:i:s');
     }
 
-    public function setLastLogin(\DateTimeInterface $last_login): self
+    public function setLastLogin(DateTimeInterface $last_login): self
     {
         $this->last_login = $last_login;
 
