@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container-fluid stretch">
+        <div class="row stretch">
+            <div class="col-md-2 p-0 sidebar-column">
+                <div class="sidebar">
+                    <div class="item logo"></div>
+                    <div class="item userinfo">
+                        <img src="{{ user_info.avatar }}"/>
+                        <span>Hello, <b>{{ user_info.name }}</b></span>
+                    </div>
+                    <div class="item center-content">
+                        <div class="serverinfo">
+                            <sup class="text-secondary">Currently working on:</sup>
+                            <span class="text-primary size" data-container="body" data-trigger="hover"
+                                  data-toggle="popover" data-placement="top"
+                                  data-content="{{ active_server(servers, user_info.active_server) }}">{{ active_server(servers, user_info.active_server) }}</span>
+                        </div>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary" data-toggle="dropdown">
+                                <span>Select server <i class="mdi mdi-chevron-down"></i></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                {% if servers is empty %}
+                                    <a class="dropdown-item" href="{{ path('server_management') }}">Create server first</a>
+                                {% else %}
+                                    {% for server in servers %}
+                                        <a class="dropdown-item" href="{{ path('server_set', {'id': server.getId(), 'backurl': path(app.request.attributes.get('_route'),
+                                            app.request.attributes.get('_route_params'))})  }}">{{ server.getName() }}</a>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% if active != 'dashboard' %}{{ path('app') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'dashboard' %}active{% endif %}">
+                            <i class="mdi mdi-view-dashboard-outline"></i><span>Dashboard</span>
+                        </div>
+                    </a>
+                    <a href="{% if active != 'servers' %}{{ path('server_management') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'servers' %}active{% endif %}">
+                            <i class="mdi mdi-server"></i><span>Servers</span>
+                        </div>
+                    </a>
+
+                    <a href="{% if active != 'players' %}{{ path('players') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'players' %}active{% endif %}">
+                            <i class="mdi mdi-account"></i><span>Players</span>
+                        </div>
+                    </a>
+                    <a href="{% if active != 'analytics' %}{{ path('analytics') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'analytics' %}active{% endif %}">
+                            <i class="mdi mdi-home-analytics"></i><span>Analytics<sup> β</sup></span>
+                        </div>
+                    </a>
+                    <a href="{% if active != 'modules' %}{{ path('server_management') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'modules' %}active{% endif %}">
+                            <i class="mdi mdi-power-plug"></i><span>Modules</span>
+                        </div>
+                    </a>
+                    <a href="{% if active != 'settings' %}{{ path('server_management') }}{% else %}#{% endif %}">
+                        <div class="menu-item {% if active == 'settings' %}active{% endif %}">
+                            <i class="mdi mdi-settings-outline"></i><span>Settings</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-10 p-0 canvas-column" style="min-width:81%;">
+                <div class="canvas">
+                    <div class="logout">
+                        <a href="{{ path('logout') }}" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="top" data-content="Logout"><i class="mdi mdi-logout"></i></a>
+                    </div>
+
+                    {% block content %} {% endblock %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'app/layout.html.twig' %}
+
+{% block title %}Players list{% endblock %}
+
+{% block content %}
+    <div class="heading">
+        <i class="mdi mdi-account"></i><span>Players</span>
+    </div>
+
+    <div class="row content-row" style="margin-top:30px;">
+        <div class="col-md-12">
+            <div class="trackr-card">
+
+                <div class="trackr-card-heading trackr-card-heading-sm">
+                    <i class="mdi mdi-magnify"></i> <span>Players list</span>
+                </div>
+
+                <div class="row-separator">
+                    <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="5%" height="30"
+                         viewBox="0 0 100 102" preserveAspectRatio="none">
+                        <path d="M0 0 L50 100 L100 0 Z"/>
+                    </svg>
+                </div>
+
+                <div class="trackr-card-content">
+                    <form class="filter-form form-inline">
+                        <div class="form-group">
+                            <label for="steamid" style="margin-left:30px; margin-right:11px;">SteamID: </label>
+                            <input id="steamid" type="text" name="steamid" value="{{ steamid }}" style="width:280px;" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="ip" style="margin-left:30px; margin-right:11px;">Ip-address: </label>
+                            <input id="ip" type="text" name="ip" value="{{ ip }}" style="width:280px;" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="datetime" style="margin-left:30px; margin-right:11px;">Last login:
+
+                            </label>
+                            <input id="datetime" type="text" style="width:350px;" class="form-control" name="datetimes">
+                        </div>
+                        <div class="form-group" style="margin-left:30px;">
+                            <button class="btn btn-success" type="submit"><span>Search</span></button>
+                        </div>
+
+                        <div class="form-group" style="margin-left:10px;">
+                            <button class="btn btn-primary" type="button" onclick="window.location.replace('{{ path('players') }}')"><span>Reset</span></button>
+                        </div>
+                    </form>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <td>SteamID</td>
+                                <td>Register IP</td>
+                                <td>
+                                    <form method="get" action="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" id="sort-form" class="form-inline">
+                                        <label for="sort" style="margin-right:10px;">Last login: </label>
+                                        <select id="sort" name="p_sort" class="form-control" onchange="$('#sort-form').submit()">
+                                            <option value="asc" {% if sort == 'asc' %} selected {% endif %}>↑ Ascending</option>
+                                            <option value="desc" {% if sort == 'desc' %} selected {% endif %}>↓ Descending</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if players is not empty %}
+                                {% for player in players %}
+                                    <tr>
+                                        <td><a data-container="body" data-trigger="hover"
+                                               data-toggle="popover" data-placement="right"
+                                               data-content="View player info" style="text-decoration: underline" href="{{ path('player_lookup', {steamid: player.getSteamId()}) }}">{{ player.getSteamId() }} <i class="mdi mdi-eye-outline"></i></a></td>
+                                        <td>{{ player.getRegisterIp() }}</td>
+                                        <td>{{ player.getLastLogin() }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="3">
+                                    <i class="mdi mdi-alert-decagram" style="color:#FFA000; font-size:28px;"></i><span style="position:relative; top:-4px; margin-left:10px;">There is no information by specified filter or there are no players on your server!</span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    <div class="navigation">
+                        {{ knp_pagination_render(players) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script>
+        $(function() {
+            $('input[name="datetimes"]').daterangepicker({
+
+                timePicker:true,
+                timePicker24Hour: true,
+                timePickerSeconds: true,
+                applyButtonClasses: 'btn-primary-wa',
+                {% if min_date is not null %}
+                startDate: moment('{{ from }}'),
+                minDate: moment('{{ min_date }}'),
+                endDate: moment('{{ to }}'),
+                maxDate: moment('{{ max_date }}'),
+                {% endif %}
+                locale: {
+                    format: 'YYYY/MM/DD HH:mm:ss'
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+{% endblock %}

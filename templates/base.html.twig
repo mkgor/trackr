@@ -2,11 +2,41 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>Trackr - {% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="//cdn.materialdesignicons.com/4.4.95/css/materialdesignicons.min.css" />
+
+        <link rel="stylesheet" href="{{ asset('public/dist/css/styles.min.css') }}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@8.17.6/dist/sweetalert2.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8.17.6/dist/sweetalert2.min.js"></script>
         {% block stylesheets %}{% endblock %}
+        {% block top_javascripts %}{% endblock %}
     </head>
     <body>
+    {% for message in app.flashes('notice') %}
+        <script>
+            Swal.fire('','{{ message }}','info');
+        </script>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <script>
+            Swal.fire('Error','{{ message }}','error');
+        </script>
+    {% endfor %}
+
+    {% for message in app.flashes('success') %}
+        <script>
+            Swal.fire('Well done!','{{ message }}','success');
+        </script>
+    {% endfor %}
         {% block body %}{% endblock %}
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ asset('public/dist/js/bundle.min.js') }}"></script>
         {% block javascripts %}{% endblock %}
     </body>
 </html>

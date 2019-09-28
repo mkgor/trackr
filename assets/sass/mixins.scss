@@ -1,0 +1,9 @@
+@import "variables";
+
+@mixin appendShadow() {
+  box-shadow:5px 0 3px 0 rgba(50, 50, 50, 0.02);
+}
+
+@mixin appendCardShadow() {
+  box-shadow: 0 3px 6px -6px;
+}
