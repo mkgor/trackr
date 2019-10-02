@@ -1,4 +1,7 @@
 {
+    "beberlei/doctrineextensions": {
+        "version": "v1.2.3"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -510,6 +513,9 @@
     },
     "webmozart/assert": {
         "version": "1.5.0"
+    },
+    "xpaw/php-source-query-class": {
+        "version": "1.0.0"
     },
     "zendframework/zend-code": {
         "version": "3.3.2"

@@ -49,6 +49,27 @@ class Visit
     private $player_new;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $online;
+
+    /**
+     * @return mixed
+     */
+    public function getOnline()
+    {
+        return $this->online;
+    }
+
+    /**
+     * @param mixed $online
+     */
+    public function setOnline($online): void
+    {
+        $this->online = $online;
+    }
+
+    /**
      * Visit constructor.
      * @throws Exception
      */
@@ -57,6 +78,7 @@ class Visit
         $this->time = new DateTime();
         $this->player_unique = false;
         $this->player_new = false;
+        $this->online = 0;
     }
 
     /**

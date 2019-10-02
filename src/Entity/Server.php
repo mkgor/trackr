@@ -24,6 +24,11 @@ class Server
     private $name;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    private $ip;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Visit", mappedBy="server")
      */
     private $visits;
@@ -43,9 +48,36 @@ class Server
      */
     private $active;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $online;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $maxOnline;
+
+
     public function __construct()
     {
         $this->visits = new ArrayCollection();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * @param mixed $ip
+     */
+    public function setIp($ip): void
+    {
+        $this->ip = $ip;
     }
 
     public function getId(): ?int
@@ -142,5 +174,37 @@ class Server
     public function setActive($active): void
     {
         $this->active = $active;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMaxOnline()
+    {
+        return $this->maxOnline;
+    }
+
+    /**
+     * @param mixed $maxOnline
+     */
+    public function setMaxOnline($maxOnline): void
+    {
+        $this->maxOnline = $maxOnline;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOnline()
+    {
+        return $this->online;
+    }
+
+    /**
+     * @param mixed $online
+     */
+    public function setOnline($online): void
+    {
+        $this->online = $online;
     }
 }

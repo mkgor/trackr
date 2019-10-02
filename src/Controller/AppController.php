@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Configuration;
 use App\Entity\Server;
 use App\Entity\Visit;
 use App\Service\ActivityCounterService;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -49,6 +51,11 @@ class AppController extends AbstractController
     private $filter;
 
     /**
+     * @var KernelInterface
+     */
+    private $kernel;
+
+    /**
      * AppController constructor.
      *
      * @param SessionInterface       $session
@@ -56,13 +63,14 @@ class AppController extends AbstractController
      * @param PaginatorInterface     $bundle
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(SessionInterface $session, ActivityCounterService $activityCounterService, PaginatorInterface $bundle, EntityManagerInterface $entityManager, FilterService $filter)
+    public function __construct(SessionInterface $session, ActivityCounterService $activityCounterService, PaginatorInterface $bundle, EntityManagerInterface $entityManager, FilterService $filter, KernelInterface $kernel)
     {
         $this->session = $session;
         $this->counter = $activityCounterService;
         $this->knp = $bundle;
         $this->em = $entityManager;
         $this->filter = $filter;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -76,6 +84,14 @@ class AppController extends AbstractController
         $servers = $this->getDoctrine()->getRepository(Server::class)->findBy([
             'active' => 1,
         ]);
+
+        $serverIp = null;
+
+        foreach($servers as $server) {
+            if($server->getId() == $this->session->get('active_server')) {
+                $serverId = $server->getId();
+            }
+        }
 
         $visits = $this->em->createQuery('SELECT visit FROM App\Entity\Visit visit WHERE visit.server = ?1 ORDER BY visit.time DESC')
             ->setParameter(1, $this->session->get('active_server'));
@@ -98,12 +114,16 @@ class AppController extends AbstractController
 
         $dates = $this->filter->handleMinMaxDates($min_date, $max_date, 'time');
 
+        $monitoringStatus = $this->getDoctrine()->getRepository(Configuration::class)->find(1)->getMonitoringEnabled();
+
         return $this->render('app/index.html.twig', [
             'min_date'  => $dates->getMinDate(),
-            'max_date'  => $dates->getMinDate(),
+            'max_date'  => $dates->getMaxDate(),
             'user_info' => $this->session->all(),
             'servers'   => $servers,
+            'server_id' => $serverId,
             'active'    => 'dashboard',
+            'monitoring' => $monitoringStatus,
             'visits'    => [
                 'total'            => $this->counter->getTotal(),
                 'totalDifference'  => $this->counter->getTotalDifference(),

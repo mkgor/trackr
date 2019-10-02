@@ -11,6 +11,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use App\Service\FilterService;
 use SimpleXMLElement;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -161,15 +162,29 @@ class PlayerController extends AbstractController
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function lookup($steamid, Request $request)
+    public function lookup($steamid = null, Request $request)
     {
         $httpClient = HttpClient::create();
-        $playerInfo = $httpClient->request('GET', 'https://steamcommunity.com/profiles/' . $steamid . '/?xml=1');
 
         try {
-            $playerInfo = (new SimpleXMLElement($playerInfo->getContent()));
-        } catch (Exception $e) {
-            $this->addFlash('error', 'Wrong steamID!');
+            $playerInfo = $httpClient->request('GET', 'https://steamcommunity.com/profiles/' . $steamid . '/?xml=1', ['timeout' => 5]);
+
+            if($playerInfo->getStatusCode() == 503) {
+                $this->addFlash('error', 'Steam API is unavailable now.');
+
+                return new RedirectResponse($this->generateUrl('players'));
+            } else {
+                try {
+                    $playerInfo = (new SimpleXMLElement($playerInfo->getContent()));
+                } catch (Exception $e) {
+                    $this->addFlash('error', 'Wrong steamID');
+
+                    return new RedirectResponse($this->generateUrl('players'));
+                }
+            }
+
+        } catch (TransportException $e) {
+            $this->addFlash('error', 'Steam API connection timeout (maybe servers are down or overloaded)');
 
             return new RedirectResponse($this->generateUrl('players'));
         }
@@ -185,7 +200,6 @@ class PlayerController extends AbstractController
 
         $players = $playerRepository->findBy([
             'steamid' => $steamid,
-            'server'  => $this->session->get('active_server'),
         ]);
 
         if (empty($players)) {
@@ -196,9 +210,15 @@ class PlayerController extends AbstractController
             $trackedInfo = $players[0];
         }
 
+        if($trackedInfo->getName() != $playerInfo->steamID) {
+            $trackedInfo->setName($playerInfo->steamID);
+
+            $this->em->persist($trackedInfo);
+            $this->em->flush();
+        }
+
         $playerServers = $playerRepository->findBy([
             'steamid' => $steamid,
-
         ]);
 
         $serversArray = [];
@@ -281,6 +301,29 @@ class PlayerController extends AbstractController
             'sort'       => $sort,
             'visits'     => $pagination,
             'ip'         => $request->query->get('ip'),
+        ]);
+    }
+
+    /**
+     * @Route("/app/player/search", name="player_search")
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function searchSteamId(Request $request)
+    {
+        $player = $this->em->getRepository(Player::class)->findBy([
+            'name' => $request->query->get('name')
+        ]);
+
+        if(isset($player[0]) && !empty($player[0]->getSteamid())) {
+            $response = json_encode(['found' => 'true', 'steamid' => $player[0]->getSteamid()]);
+        } else {
+            $response = json_encode(['found' => 'false']);
+        }
+
+        return new Response($response, 200, [
+            'Content-type' => 'application/json'
         ]);
     }
 }

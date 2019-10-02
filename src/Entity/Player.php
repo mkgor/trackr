@@ -18,6 +18,11 @@ class Player
     private $id;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $name;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $steamid;
@@ -64,6 +69,23 @@ class Player
         $this->last_login = $last_login;
 
         return $this;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name): void
+    {
+        $this->name = $name;
     }
 
     /**

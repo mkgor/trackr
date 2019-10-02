@@ -8,8 +8,8 @@
     </div>
 
     <div class="row content-row">
-        <div class="col-md-4">
-            <div class="trackr-card">
+        <div class="col-md-{% if monitoring %}3{% else %}4{% endif %}">
+            <div class="trackr-card" style="height:214px;">
                 <div class="trackr-card-heading trackr-card-heading-sm">
                     <i class="mdi mdi-account"></i> <span>Visits</span>
                 </div>
@@ -31,8 +31,8 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="trackr-card trackr-card-unique">
+        <div class="col-md-{% if monitoring %}3{% else %}4{% endif %}">
+            <div class="trackr-card trackr-card-unique" style="height:214px;">
                 <div class="trackr-card-heading trackr-card-heading-sm">
                     <i class="mdi mdi-account-star"></i> <span>Unique</span>
                 </div>
@@ -54,8 +54,8 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="trackr-card trackr-card-new">
+        <div class="col-md-{% if monitoring %}3{% else %}4{% endif %}">
+            <div class="trackr-card trackr-card-new" style="height:214px;">
                 <div class="trackr-card-heading trackr-card-heading-sm">
                     <i class="mdi mdi-account-plus"></i> <span>New players</span>
                 </div>
@@ -76,10 +76,77 @@
                 </div>
             </div>
         </div>
+
+        {% if monitoring %}
+        <div class="col-md-3">
+            <div class="trackr-card" style="height:214px;">
+                <div class="trackr-card-heading trackr-card-heading-sm">
+                    <i class="mdi mdi-server"></i> <span>Current online</span>
+                </div>
+                <div class="row-separator">
+                    <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="15%" height="30"
+                         viewBox="0 0 100 102" preserveAspectRatio="none">
+                        <path d="M0 0 L50 100 L100 0 Z"/>
+                    </svg>
+                </div>
+
+                <div class="trackr-card-content">
+                    <sup><span id="server-error" style="position: absolute; width:200px; "
+                               class="text-danger"></span></sup>
+
+                    <sup>Updates automatically every 5 seconds</sup>
+
+                    <div class="counter-digits">
+                        <span class="counter-total">
+                            <span id="cur-online">-</span>/<sup id="max-online" class="max-online">-</sup>
+                        </span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="position:absolute; bottom:10px;"
+                            onclick="updateOnline();"><span><i class="mdi mdi-refresh"></i>Refresh</span></button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <div class="row content-row">
+        {% if monitoring %}
+
         <div class="col-md-12">
+            <div class="trackr-card trackr-card-new">
+                <div class="trackr-card-heading trackr-card-heading-sm">
+                    <i class="mdi mdi-account"></i> <span>Players online</span>
+                </div>
+                <div class="row-separator">
+                    <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="5%" height="30"
+                         viewBox="0 0 100 102" preserveAspectRatio="none">
+                        <path d="M0 0 L50 100 L100 0 Z"/>
+                    </svg>
+                </div>
+                <div class="trackr-card-content">
+
+                    <table class="table table-striped" id="players-table">
+                        <thead>
+                        <tr>
+                            <th style="width:700px;">Name</th>
+                            <td>Steam ID</td>
+                        </tr>
+                        </thead>
+                        <tbody id="players-table-body">
+
+                        </tbody>
+                    </table>
+                    <br>
+                    <button class="btn btn-success btn-sm" style="position:absolute; bottom:10px;"
+                            onclick="updatePlayers();">
+                        <span><i class="mdi mdi-refresh"></i>Refresh</span></button>
+
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="col-md-12 content-row">
             <div class="trackr-card trackr-card-total">
                 <div class="trackr-card-heading trackr-card-heading-sm">
                     <i class="mdi mdi-magnify"></i> <span>Visits summary</span>
@@ -99,11 +166,11 @@
                         </div>
                         <div class="form-group">
                             <label for="steamid" style="margin-left:30px; margin-right:11px;">SteamID: </label>
-                            <input id="steamid" type="text" name="steamid"  style="width:280px;" class="form-control">
+                            <input id="steamid" type="text" name="steamid" style="width:280px;" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="ip" style="margin-left:30px; margin-right:11px;">Ip-address: </label>
-                            <input id="ip" type="text" name="ip"  style="width:280px;" class="form-control">
+                            <input id="ip" type="text" name="ip" style="width:280px;" class="form-control">
                         </div>
                         <div class="form-group" style="margin-left:30px;">
                             <button class="btn btn-success" type="submit"><span>Search</span></button>
@@ -112,11 +179,11 @@
 
                     <table class="table">
                         <thead>
-                            <tr>
-                                <td>Login time</td>
-                                <td>SteamID</td>
-                                <td>Login ip</td>
-                            </tr>
+                        <tr>
+                            <td>Login time</td>
+                            <td>SteamID</td>
+                            <td>Login ip</td>
+                        </tr>
                         </thead>
 
                         <tbody>
@@ -126,17 +193,28 @@
                                     <td>{{ visit.getTime() }}</td>
                                     <td><a data-container="body" data-trigger="hover"
                                            data-toggle="popover" data-placement="left"
-                                           data-content="View player info" style="text-decoration: underline; color:#000;" href="{{ path('player_lookup', {steamid: visit.getSteamId()}) }}"><i class="mdi mdi-eye-outline"></i>{{ visit.getSteamId() }}</a>{% if visit.getNew() %} <i class="mdi mdi-account-plus" style="font-size:20px; color:#1B5E20;" data-container="body" data-trigger="hover"
-                                                                                              data-toggle="popover" data-placement="right"
-                                                                                              data-content="New user"></i> {% elseif visit.getUnique() %} <i class="mdi mdi-account-star" style="font-size:20px; color:#5E35B1;" data-container="body" data-trigger="hover"
-                                                                                                                                                             data-toggle="popover" data-placement="right"
-                                                                                                                                                             data-content="Unique user"></i> {% endif %}</td>
+                                           data-content="View player info"
+                                           style="text-decoration: underline; color:#000;"
+                                           href="{{ path('player_lookup', {steamid: visit.getSteamId()}) }}"><i
+                                                    class="mdi mdi-eye-outline"></i>{{ visit.getSteamId() }}
+                                        </a>{% if visit.getNew() %} <i class="mdi mdi-account-plus"
+                                                                       style="font-size:20px; color:#1B5E20;"
+                                                                       data-container="body" data-trigger="hover"
+                                                                       data-toggle="popover" data-placement="right"
+                                                                       data-content="New user"></i> {% elseif visit.getUnique() %}
+                                        <i class="mdi mdi-account-star" style="font-size:20px; color:#5E35B1;"
+                                           data-container="body" data-trigger="hover"
+                                           data-toggle="popover" data-placement="right"
+                                           data-content="Unique user"></i> {% endif %}</td>
                                     <td>{{ visit.getIp() }}</td>
                                 </tr>
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="3"><i class="mdi mdi-alert-decagram" style="color:#FFA000; font-size:28px;"></i><span style="position:relative; top:-4px; margin-left:10px;">This server has not yet been visited by anyone.</span></td>
+                                <td colspan="3"><i class="mdi mdi-alert-decagram"
+                                                   style="color:#FFA000; font-size:28px;"></i><span
+                                            style="position:relative; top:-4px; margin-left:10px;">This server has not yet been visited by anyone.</span>
+                                </td>
                             </tr>
                         {% endif %}
                         </tbody>
@@ -156,19 +234,104 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script>
-        $(function() {
+        {% if monitoring %}
+        var theadStamp = $("#players-table > thead").html();
+
+        $(document).ready(function () {
+            updateOnline();
+            updatePlayers();
+            setInterval(updateOnline, 5000);
+            setInterval(updatePlayers, 5000);
+
+            $("#refresh-button").click(function (e) {
+                e.preventDefault();
+            });
+        });
+
+
+        function updateOnline() {
+            $.ajax({
+                url: '{{ path('server_info') }}',
+                method: 'GET',
+                data: {
+                    id: '{{ server_id }}'
+                },
+                success: function (result) {
+                    if (result.error !== '') {
+                        $("#cur-online").html(result.online);
+                        $("#max-online").html(result.maxonline);
+                        $("#server-error").html('');
+                    } else {
+                        $("#server-error").html('Server is not responding');
+                    }
+                },
+                error: function (error) {
+                    $("#server-error").html('Server is not responding');
+                }
+            })
+        }
+
+        function updatePlayers() {
+            $.ajax({
+                url: '{{ path('server_players') }}',
+                method: 'GET',
+                data: {
+                    id: '{{ server_id }}'
+                },
+                success: function (result) {
+                    if (result.error !== '') {
+                        $("#players-table-body").html('');
+
+                        result.forEach(function (item) {
+                            $("#players-table > thead").html(theadStamp);
+
+                            if(!item.bot) {
+                                $("#players-table-body").append(
+                                    "<tr>" +
+                                    "<td>" + item.name + "</td>" +
+                                    "<td><a style='text-decoration:underline; color:#000;' href='{{ url('player_lookup') }}/" + item.steamid + "'>" + item.steamid + "<i class=\"mdi mdi-eye-outline\"></a></td>" +
+                                    "</tr>"
+                                );
+                            } else {
+                                $("#players-table-body").append(
+                                    "<tr>" +
+                                    "<td>" + item.name + "</td>" +
+                                    "<td> <i class='mdi mdi-robot'></i> Bot</td>" +
+                                    "</tr>"
+                                );
+                            }
+
+
+                            $("#players-table").fancyTable({
+                                sortColumn: 0, // column number for initial sorting
+                                sortOrder: 'descending', // 'desc', 'descending', 'asc', 'ascending', -1 (descending) and 1 (ascending)
+                                sortable: true,
+                                pagination: true, // default: false
+                                pagClosest: 3,
+                                perPage: 10,
+                                searchable: true,
+                                globalSearch: true,
+                                inputStyle: "padding:4px; border-radius:4px; border:1px solid #ccc; position:relative; width:50%;",
+                            });
+                        });
+                    }
+                }
+            });
+        }
+        {% endif %}
+        $(function () {
             $('input[name="datetimes"]').daterangepicker({
 
-                timePicker:true,
+                timePicker: true,
                 timePicker24Hour: true,
                 timePickerSeconds: true,
                 applyButtonClasses: 'btn-primary-wa',
-            {% if min_date is not null %}
+                {% if min_date is not null %}
                 startDate: moment('{{ min_date }}'),
                 minDate: moment('{{ min_date }}'),
                 endDate: moment('{{ max_date }}'),
                 maxDate: moment('{{ max_date }}'),
-            {% endif %}
+                {% endif %}
                 locale: {
                     format: 'YYYY/MM/DD HH:mm:ss'
                 }
@@ -178,5 +341,5 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
 {% endblock %}

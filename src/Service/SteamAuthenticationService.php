@@ -91,7 +91,7 @@ class SteamAuthenticationService
 
     public function logout()
     {
-        $this->session->clear();
+        @session_destroy();
 
         return new RedirectResponse($this->generator->generate('login'));
     }

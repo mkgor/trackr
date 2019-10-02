@@ -2,57 +2,183 @@
 
 {% block title %}Analytics (beta){% endblock %}
 
+{% set current_month = 'now'|date('F') %}
+{% set current_year = 'now'|date('Y') %}
+
 {% block content %}
     <div class="heading">
         <i class="mdi mdi-home-analytics"></i><span>Analytics <sup>β</sup></span>
     </div>
 
     <div class="row content-row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="trackr-card">
+                <div class="trackr-card-heading trackr-card-heading-sm">
+                    <i class="mdi mdi-select-compare"></i> Comparative analysis
+                </div>
+
                 <div class="trackr-card-content">
-                    <form class="form-inline">
-                        <label for="by_year" style="margin-right:10px;">Year: </label>
+                    <div class="row">
+                        <div class="col-md-6" style="width:49%;">
+                            <div class="trackr-card">
+                                <div class="trackr-card-content">
+                                    <form class="form-inline">
+                                        <label for="by_year" style="margin-right:10px;">Year: </label>
 
-                        <select id="by_year" name="by_year" class="form-control">
-                            <option>2019</option>
-                        </select>
+                                        <select id="by_year" name="by_year" class="form-control"
+                                                onchange="updateChart(1, $('#by_year').val(), $('#by_month').val())">
+                                            {% for year in years %}
+                                                <option {% if year == current_year %} selected {% endif %}
+                                                        value="{{ year }}">{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
 
-                        <label for="by_month" style="margin-left:40px; margin-right:10px;">Month: </label>
+                                        <label for="by_month"
+                                               style="margin-left:40px; margin-right:10px;">Month: </label>
 
-                        <select id="by_month" name="by_year" class="form-control">
-                            <option>Not specified</option>
-                            <option>January</option>
-                            <option>FEB</option>
-                        </select>
-                    </form>
-                    <canvas class="chart" id="chart"></canvas>
+                                        <select id="by_month" name="by_year" class="form-control"
+                                                onchange="updateChart(1, $('#by_year').val(), $('#by_month').val())">
+                                            <option value="0">Not specified</option>
+                                            {% for month in months %}
+                                                <option value="{{ loop.index }}">{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
+                                    <sub>Click on rectangle to hide line</sub>
+                                    <canvas class="chart" id="chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="width:49%;">
+                            <div class="trackr-card">
+                                <div class="trackr-card-content">
+                                    <form class="form-inline">
+                                        <label for="by_year_2" style="margin-right:10px;">Year: </label>
+
+                                        <select id="by_year_2" name="by_year" class="form-control"
+                                                onchange="updateChart(2, $('#by_year_2').val(), $('#by_month_2').val())">
+                                            {% for year in years %}
+                                                <option {% if year == current_year %} selected {% endif %}
+                                                        value="{{ year }}">{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for="by_month_2"
+                                               style="margin-left:40px; margin-right:10px;">Month: </label>
+
+                                        <select id="by_month_2" name="by_year" class="form-control"
+                                                onchange="updateChart(2, $('#by_year_2').val(), $('#by_month_2').val())">
+                                            <option value="0">Not specified</option>
+                                            {% for month in months %}
+                                                <option value="{{ loop.index }}">{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
+
+                                    <sub>Click on rectangle to hide line</sub>
+                                    <canvas class="chart" id="chart2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <div class="trackr-card">
-                <div class="trackr-card-content">
-                    <form class="form-inline">
-                        <label for="by_year_2" style="margin-right:10px;">Year: </label>
+    <div class="row content-row">
+        <div class="col-md-3">
+            <div class="row m-0">
+                <div class="trackr-card" style="height:200px;">
+                    <div class="trackr-card-heading trackr-card-heading-sm">
+                        <i class="mdi mdi-account-group"></i> Maximum online today
+                    </div>
+                    <div class="row-separator">
+                        <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="15%"
+                             height="30"
+                             viewBox="0 0 100 102" preserveAspectRatio="none">
+                            <path d="M0 0 L50 100 L100 0 Z"/>
+                        </svg>
+                    </div>
+                    <div class="trackr-card-content">
+                        <div class="counter-digits">
+                            <div class="counter-total">
+                                {% if peak_visit.getOnline() is not null %}
+                                    {{ peak_visit.getOnline() }}
+                                {% else %}
+                                    {{ peak_visit }}
+                                {% endif %}
+                            </div>
+                            {% if peak_visit.getOnline() is not null %}
+                                <span style="position:relative; font-size:14px; top:-40px;">Was on <b>{{ peak_visit.getTime()|date('H:i') }}</b></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <select id="by_year_2" name="by_year" class="form-control">
-                            <option>2019</option>
-                        </select>
+            <div class="row m-0 content-row">
+                <div class="trackr-card" style="height:210px;">
+                    <div class="trackr-card-heading trackr-card-heading-sm">
+                        <i class="mdi mdi-clock-outline"></i> Average online time
+                    </div>
+                    <div class="row-separator">
+                        <svg id="bigTriangleColor" xmlns="http://www.w3.org/2000/svg" version="1.1" width="15%"
+                             height="30"
+                             viewBox="0 0 100 102" preserveAspectRatio="none">
+                            <path d="M0 0 L50 100 L100 0 Z"/>
+                        </svg>
+                    </div>
+                    <div class="trackr-card-content">
+                        <div class="counter-digits">
+                            <div class="counter-total">
+                                {{ average_peak_time }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="col-md-9">
+        <div class="trackr-card" style="height:400px;">
+            <div class="trackr-card-heading trackr-card-heading-sm">
+                <i class="mdi mdi-chart-areaspline"></i> Online Peak Summary
+            </div>
+            <div class="row-separator">
 
-                        <label for="by_month_2" style="margin-left:40px; margin-right:10px;">Month: </label>
+            </div>
+            <div class="trackr-card-content">
+                <form class="form-inline">
+                    <label for="by_year_peaks" style="margin-right:10px;">Year: </label>
 
-                        <select id="by_month_2" name="by_year" class="form-control">
-                            <option>Not specified</option>
-                            <option>January</option>
-                            <option>FEB</option>
-                        </select>
-                    </form>
-                    <canvas class="chart" id="chart2"></canvas>
+                    <select id="by_year_peaks" name="by_year" class="form-control"
+                            onchange="updateChart(3, $('#by_year_peaks').val(), $('#by_month_peaks').val())">
+                        {% for year in years %}
+                            <option {% if year == current_year %} selected {% endif %}
+                                    value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="by_month_peaks"
+                           style="margin-left:40px; margin-right:10px;">Month: </label>
+
+                    <select id="by_month_peaks" name="by_year" class="form-control"
+                            onchange="updateChart(3, $('#by_year_peaks').val(), $('#by_month_peaks').val())">
+                        <option value="0">Not specified</option>
+                        {% for month in months %}
+                            <option value="{{ loop.index }}">{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <sub>Click on rectangle to hide line</sub>
+                <div style="height:250px;">
+                    <canvas class="chart" id="peak_chart"></canvas>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
 {% endblock %}
@@ -60,40 +186,167 @@
 {% block javascripts %}
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
     <script type="text/javascript">
-        new Chart(document.getElementById("chart"), {
-            "type": "line",
-            "data": {
-                "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-                "datasets": [{
-                    "label": "Total visits",
-                    "data": [65, 59, 80, 81, 56, 55, 40],
-                    "fill": false,
-                    "borderColor": "#1C5FCC",
-                    "fillColor": "#1C5FCC",
-                    "lineTension": 0.2
-                }]
-            },
-            "options": {}
+        var chart_1 = null;
+        var chart_2 = null;
+        var chart_3 = null;
+
+        $(document).ready(function () {
+            $.ajax({
+                url: '{{ path('analytics_api') }}',
+                method: 'GET',
+                data: {
+                    year: new Date().getFullYear(),
+                },
+                success: function (result) {
+                    chart_1 = generateChart('chart', result.labels, result.data);
+                    chart_2 = generateChart('chart2', result.labels, result.data);
+                    updateChart(3, new Date().getFullYear(), 0)
+                },
+                error: function (error) {
+                    Swal.fire('Something went wrong!', error.message, 'error');
+                }
+            });
         });
 
-        new Chart(document.getElementById("chart2"), {
-            "type": "line",
-            "data": {
-                "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-                "datasets": [{
-                    "label": "Total visits",
-                    "data": [65, 59, 80, 81, 56, 55, 40],
-                    "fill": false,
-                    "borderColor": "rgb(75, 192, 192)",
-                    "lineTension": 0.1
-                }]
-            },
-            "options": {}
-        });
+        function updateChart(chart, year, month) {
+            if (chart === 1) {
+                $.ajax({
+                    url: '{{ path('analytics_api') }}',
+                    method: 'GET',
+                    data: {
+                        year: year,
+                        month: month,
+                    },
+                    success: function (result) {
+                        chart_1.destroy();
+                        chart_1 = generateChart('chart', result.labels, result.data);
+                    },
+                    error: function (error) {
+                        Swal.fire('Something went wrong!', error.message, 'error');
+                    }
+                });
+            } else if (chart === 2) {
+                $.ajax({
+                    url: '{{ path('analytics_api') }}',
+                    method: 'GET',
+                    data: {
+                        year: year,
+                        month: month,
+                    },
+                    success: function (result) {
+                        chart_2.destroy();
+                        chart_2 = generateChart('chart2', result.labels, result.data);
+                    },
+                    error: function (error) {
+                        Swal.fire('Something went wrong!', error.message, 'error');
+                    }
+                });
+            } else if (chart === 3) {
+                $.ajax({
+                    url: '{{ path('analytics_peaks_api') }}',
+                    method: 'GET',
+                    data: {
+                        year: year,
+                        month: month,
+                    },
+                    success: function (result) {
+                        if (chart_3 instanceof Chart) {
+                            chart_3.destroy();
+                        }
+                        chart_3 = new Chart(document.getElementById('peak_chart'), {
+                            "type": "line",
+                            "data": {
+                                "labels": result.labels,
+                                "datasets": [{
+                                    "label": "Peak of online",
+                                    "data": result.data,
+                                    "fill": false,
+                                    "borderColor": "#1C5FCC",
+                                    "backgroundColor": "#1C5FCC",
+                                    "lineTension": 0.2
+                                }]
+                            },
+                            "options": {
+                                "tooltips": {
+                                    "mode": "index",
+                                    "intersect": false
+
+                                },
+                                maintainAspectRatio: false,
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                            callback: function (value) {
+                                                if (value % 1 === 0) {
+                                                    return value;
+                                                }
+                                            }
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        Swal.fire('Something went wrong!', error.message, 'error');
+                    }
+                });
+            }
+        }
+
+        function generateChart(id, labels, data) {
+            return new Chart(document.getElementById(id), {
+                "type": "line",
+                "data": {
+                    "labels": labels,
+                    "datasets": [{
+                        "label": "Total visits",
+                        "data": data.total,
+                        "fill": false,
+                        "borderColor": "#1C5FCC",
+                        "backgroundColor": "#1C5FCC",
+                        "lineTension": 0.2
+                    }, {
+                        "label": "Unique visits",
+                        "data": data.unique,
+                        "fill": false,
+                        "borderColor": "#692BC0",
+                        "backgroundColor": "#692BC0",
+                        "lineTension": 0.2
+                    }, {
+                        "label": "New users",
+                        "data": data.new,
+                        "fill": false,
+                        "borderColor": "#52BC71",
+                        "backgroundColor": "#52BC71",
+                        "lineTension": 0.2
+                    }]
+                },
+                "options": {
+                    "tooltips": {
+                        "mode": "index",
+                        "intersect": false
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) {
+                                    if (value % 1 === 0) {
+                                        return value;
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }
+            });
+        }
     </script>
 {% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.css"/>
 {% endblock %}
 

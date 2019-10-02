@@ -18,9 +18,10 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Server name</th>
-                            <th scope="col">Tracking URL <i class="mdi mdi-help-box" data-container="body" data-trigger="hover"  data-html="true"
+                            <th scope="col">API key <i class="mdi mdi-help-box" data-container="body" data-trigger="hover"  data-html="true"
                                                            data-toggle="popover" data-placement="top"
-                                                           data-content="You should put it in <b>sv_loadingurl</b> to make Trackr work"></i></th>
+                                                           data-content="You should put it in <b>%trackr_addon_folder%/lua/autorun/server/sv_track.lua</b> into variable on 3rd line to make Trackr work"></i></th>
+                            <th scope="col">Server IP</th>
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
@@ -35,8 +36,9 @@
                                 <tr>
                                     <th scope="row">{{ loop.index }}</th>
                                     <td>{{ server.getName() }}</td>
-                                    <td><a href="{{ url('gate', {id: server.getHash()}) }}">{{ url('gate', {id: server.getHash()}) }}</a></td>
-                                    <td>
+                                    <td><a href="#">{{ server.getHash() }}</a></td>
+                                    <td><a href="steam://connect/{{ server.getIp() }}">{{ server.getIp() }}</a></td>
+                                    <td style="width:100px">
                                         <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editServerModal_{{ loop.index }}" ><span><i class="mdi mdi-lead-pencil"></i></span></button>
                                         <button class="btn btn-danger btn-sm" data-container="body" data-trigger="hover"
                                                 data-toggle="popover" data-placement="right"
@@ -58,15 +60,21 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="form-group">
-                                                        <label for="server_name">Server name<sup style="color:red">*</sup></label>
-                                                        <input id="server_name" type="text" placeholder="Enter your server`s name"
+                                                        <label for="server_{{ loop.index }}_name">Server name<sup style="color:red">*</sup></label>
+                                                        <input id="server_{{ loop.index }}_name" type="text" placeholder="Enter your server`s name"
                                                                name="server_name" value="{{ server.getName() }}" class="form-control" required/>
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label for="server_name">Loading screen URL<sup style="color:red">*</sup></label>
-                                                        <input id="server_name" type="text" placeholder="Enter your loading screen`s url"
-                                                               name="loading_url" value="{{ server.getLoadingUrl() }}" class="form-control" required/>
+                                                        <label for="loading_url">API Key<sup style="color:red">*</sup></label>
+                                                        <input id="loading_url" type="text" disabled
+                                                               name="loading_url" value="{{ server.getHash() }}" class="form-control" required/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="server_{{ loop.index }}_ip">Server IP<sup style="color:red">*</sup></label>
+                                                        <input id="server_{{ loop.index }}_ip" type="text" placeholder="Enter your server's ip (with port)"
+                                                               name="server_ip" value="{{ server.getIp() }}" class="form-control" required/>
                                                     </div>
 
                                                 </div>
@@ -134,17 +142,16 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="server_name">Server name<sup style="color:red">*</sup></label>
-                            <input id="server_name" type="text" placeholder="Enter your server`s name"
+                            <label for="new_server_name">Server name<sup style="color:red">*</sup></label>
+                            <input id="new_server_name" type="text" placeholder="Enter your server`s name"
                                    name="server_name" class="form-control" required/>
                         </div>
 
                         <div class="form-group">
-                            <label for="server_name">Loading screen URL<sup style="color:red">*</sup></label>
-                            <input id="server_name" type="text" placeholder="Enter your loading screen`s url"
-                                   name="loading_url" class="form-control" required/>
+                            <label for="new_server_name">Server IP<sup style="color:red">*</sup></label>
+                            <input id="new_server_ip" type="text" placeholder="Enter your server's ip (with port)"
+                                   name="server_ip"  class="form-control" required/>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>Close</span></button>

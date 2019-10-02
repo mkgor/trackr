@@ -26,6 +26,28 @@ class Configuration
      */
     private $locale;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $monitoring_enabled;
+
+
+    /**
+     * @return mixed
+     */
+    public function getMonitoringEnabled()
+    {
+        return $this->monitoring_enabled;
+    }
+
+    /**
+     * @param mixed $monitoring_enabled
+     */
+    public function setMonitoringEnabled($monitoring_enabled): void
+    {
+        $this->monitoring_enabled = $monitoring_enabled;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class RequestListener
@@ -36,16 +37,22 @@ class RequestListener
     private $entityManager;
 
     /**
+     * @var
+     */
+    private $router;
+
+    /**
      * RequestListener constructor.
      *
-     * @param SessionInterface $session
-     * @param UrlGeneratorInterface $generator
+     * @param SessionInterface       $session
+     * @param EntityManagerInterface $entityManager
+     * @param RouterInterface        $router
      */
-    public function __construct(SessionInterface $session, UrlGeneratorInterface $generator, EntityManagerInterface $entityManager)
+    public function __construct(SessionInterface $session,EntityManagerInterface $entityManager, RouterInterface $router)
     {
         $this->session = $session;
-        $this->urlGenerator = $generator;
         $this->entityManager = $entityManager;
+        $this->router = $router;
     }
 
     /**
@@ -56,12 +63,10 @@ class RequestListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $requestUri = substr($request->getRequestUri(), 1);
-        $requestUriExploded = explode('/',$requestUri);
 
-        if(array_shift($requestUriExploded) == $this->restricedArea) {
+        if(preg_match('/app/',$request->getRequestUri()) && !preg_match('/login/', $request->getRequestUri())) {
             if(!$this->session->has('steamid')) {
-                $event->setResponse(new RedirectResponse($this->urlGenerator->generate('login')));
+                $event->setResponse(new RedirectResponse($this->router->generate('login')));
             } else {
                 $request->setLocale($this->entityManager->getRepository(Configuration::class)->find(1)->getLocale());
             }

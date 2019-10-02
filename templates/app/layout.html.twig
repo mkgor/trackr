@@ -22,11 +22,13 @@
                             </button>
                             <div class="dropdown-menu">
                                 {% if servers is empty %}
-                                    <a class="dropdown-item" href="{{ path('server_management') }}">Create server first</a>
+                                    <a class="dropdown-item" href="{{ path('server_management') }}">Create server
+                                        first</a>
                                 {% else %}
                                     {% for server in servers %}
-                                        <a class="dropdown-item" href="{{ path('server_set', {'id': server.getId(), 'backurl': path(app.request.attributes.get('_route'),
-                                            app.request.attributes.get('_route_params'))})  }}">{{ server.getName() }}</a>
+                                        <a class="dropdown-item"
+                                           href="{{ path('server_set', {'id': server.getId(), 'backurl': path(app.request.attributes.get('_route'),
+                                               app.request.attributes.get('_route_params'))}) }}">{{ server.getName() }}</a>
                                     {% endfor %}
                                 {% endif %}
                             </div>
@@ -53,11 +55,11 @@
                             <i class="mdi mdi-home-analytics"></i><span>Analytics<sup> β</sup></span>
                         </div>
                     </a>
-                    <a href="{% if active != 'modules' %}{{ path('server_management') }}{% else %}#{% endif %}">
-                        <div class="menu-item {% if active == 'modules' %}active{% endif %}">
-                            <i class="mdi mdi-power-plug"></i><span>Modules</span>
-                        </div>
-                    </a>
+{#                    <a href="{% if active != 'modules' %}{{ path('server_management') }}{% else %}#{% endif %}">#}
+{#                        <div class="menu-item {% if active == 'modules' %}active{% endif %}">#}
+{#                            <i class="mdi mdi-power-plug"></i><span>Modules</span>#}
+{#                        </div>#}
+{#                    </a>#}
                     <a href="{% if active != 'settings' %}{{ path('server_management') }}{% else %}#{% endif %}">
                         <div class="menu-item {% if active == 'settings' %}active{% endif %}">
                             <i class="mdi mdi-settings-outline"></i><span>Settings</span>
@@ -68,7 +70,8 @@
             <div class="col-md-10 p-0 canvas-column" style="min-width:81%;">
                 <div class="canvas">
                     <div class="logout">
-                        <a href="{{ path('logout') }}" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="top" data-content="Logout"><i class="mdi mdi-logout"></i></a>
+                        <a href="{{ path('logout') }}" data-container="body" data-trigger="hover" data-toggle="popover"
+                           data-placement="top" data-content="Logout"><i class="mdi mdi-logout"></i></a>
                     </div>
 
                     {% block content %} {% endblock %}

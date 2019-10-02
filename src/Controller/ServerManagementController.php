@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Player;
 use App\Entity\Server;
 use App\Entity\Visit;
+use App\Service\ServerInfoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class ServerManagementController
+ *
+ * @package App\Controller
+ */
 class ServerManagementController extends AbstractController
 {
     /**
@@ -26,14 +33,21 @@ class ServerManagementController extends AbstractController
     private $em;
 
     /**
+     * @var ServerInfoService
+     */
+    private $info;
+
+    /**
      * ServerManagementController constructor.
      *
-     * @param SessionInterface $session
+     * @param SessionInterface       $session
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(SessionInterface $session, EntityManagerInterface $entityManager)
+    public function __construct(SessionInterface $session, EntityManagerInterface $entityManager, ServerInfoService $infoService)
     {
         $this->session = $session;
         $this->em = $entityManager;
+        $this->info = $infoService;
     }
 
     /**
@@ -67,6 +81,7 @@ class ServerManagementController extends AbstractController
 
             $server = new Server();
             $server->setName($request->request->get('server_name'));
+            $server->setIp($request->request->get('server_ip'));
             $server->setHash($hash);
             $server->setLoadingUrl($request->request->get('loading_url'));
             $server->setActive(1);
@@ -138,7 +153,7 @@ class ServerManagementController extends AbstractController
 
     /**
      * @Route("/app/server/edit/{id}", name="server_edit")
-     * @param         $id
+     * @param int     $id
      * @param Request $request
      *
      * @return RedirectResponse
@@ -149,6 +164,7 @@ class ServerManagementController extends AbstractController
             $server = $this->em->getRepository(Server::class)->find($id);
 
             $server->setName($request->request->get('server_name'));
+            $server->setIp($request->request->get('server_ip'));
             $server->setLoadingUrl($request->request->get('loading_url'));
 
             $this->em->persist($server);
@@ -161,4 +177,103 @@ class ServerManagementController extends AbstractController
 
         return new RedirectResponse($this->generateUrl('server_management'));
     }
+
+
+    /**
+     * @Route("/api/server/info", name="server_info")
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function getServerInfo(Request $request)
+    {
+        if ($request->query->has('id')) {
+            $data = $this->em->getRepository(Server::class)->find($request->query->get('id'));
+
+            $response = json_encode([
+                'online' => $data->getOnline(),
+                'maxonline' => $data->getMaxOnline()
+            ], JSON_UNESCAPED_UNICODE);
+            $code = 200;
+        } else {
+            $response = json_encode(['error' => 'Bad request. Server id is not specified']);
+            $code = 400;
+        }
+
+        return new Response($response, $code, [
+            'Content-type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * @Route("/app/server/players", name="server_players")
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function getServerPlayers(Request $request)
+    {
+        if ($request->query->has('id')) {
+            $serverHash = $this->em->getRepository(Server::class)
+                ->find($this->session->get('active_server'))
+                ->getHash();
+
+            $response = file_get_contents(__DIR__ . '/../Resources/' . $serverHash . '.json');
+            $code = 200;
+        } else {
+            $response = json_encode(['error' => 'Bad request. Server id is not specified']);
+            $code = 400;
+        }
+
+        return new Response($response, $code, [
+            'Content-type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * @param $o
+     *
+     * @return string
+     */
+    private function toJSON($o)
+    {
+        switch (gettype($o)) {
+            case 'NULL':
+                return 'null';
+            case 'integer':
+            case 'double':
+                return strval($o);
+            case 'string':
+                return '"' . addslashes($o) . '"';
+            case 'boolean':
+                return $o ? 'true' : 'false';
+            case 'object':
+                $o = (array)$o;
+            case 'array':
+                $foundKeys = false;
+
+                foreach ($o as $k => $v) {
+                    if (!is_numeric($k)) {
+                        $foundKeys = true;
+                        break;
+                    }
+                }
+
+                $result = [];
+
+                if ($foundKeys) {
+                    foreach ($o as $k => $v) {
+                        $result [] = $this->toJSON($k) . ':' . $this->toJSON($v);
+                    }
+
+                    return '{' . implode(',', $result) . '}';
+                } else {
+                    foreach ($o as $k => $v) {
+                        $result [] = $this->toJSON($v);
+                    }
+                    return '[' . implode(',', $result) . ']';
+                }
+        }
+    }
+
 }

@@ -22,24 +22,27 @@
                         <div style="width:270px; ">
                             <img src="{{ playerInfo.avatar }}" style="border-radius: 10px;"/>
                         </div>
-                        <div  style="text-align:left; width:300px;">
-                            <h1 style="color:#444;">{{ playerInfo.name }}</h1>
+
+                        <div  style="text-align:left; margin-right:30px; max-width:1200px;">
+                            <h4 style="color:#444;">{{ playerInfo.name }}</h4>
                             <table>
                                 <tr><td><i class="mdi mdi-server"></i> Server: <b {% if playerInfo.serversArray is not null %}style="text-decoration: underline;" data-container="body" data-trigger="hover"
                                                    data-toggle="popover" data-placement="right" data-html="true"
                                                    data-content="
 <b>Playing on:</b><br>
+<hr>
 {% for additionalServer in playerInfo.serversArray %}
-    {{ additionalServer }}<br>
+     <p><div class='text-secondary'>{{ additionalServer }}</div></p>
 {% endfor %}
-"{% endif %}>{{ playerInfo.server.getName() }} {% if playerInfo.serversArray is not null %}<i class="mdi mdi-server-plus"></i>{% endif %}</b></td></tr>
+
+"{% endif %}>{% if playerInfo.serversArray is not null %}Multiple servers <i class="mdi mdi-server-plus"></i>{% else %} {{ playerInfo.server.getName() }} {% endif %}</b></td></tr>
                                 <tr><td><i class="mdi mdi-login-variant"></i> Last login: <b>{{ playerInfo.last_login }}</b></td></tr>
                                 <tr><td><i class="mdi mdi-login-variant"></i> First login: <b>{{ playerInfo.register_date }}</b></td></tr>
                                 <tr><td><i class="mdi mdi-ip"></i> Registration IP: <b>{{ playerInfo.register_ip }}</b></td></tr>
                                 <tr><td><i class="mdi mdi-ip-network"></i> Last login IP: <b>{{ playerInfo.last_ip }}</b></td></tr>
                             </table>
                         </div>
-                        <div  style="text-align:left; padding-top:55px; width:500px;">
+                        <div  style="text-align:left; padding-top:35px; width:500px;">
                             <table>
                                 <tr><td><i class="mdi mdi-textbox"></i> Real name: <b>{{ playerInfo.realname }}</b></td></tr>
                                 <tr><td><i class="mdi mdi-map-marker"></i> Location: <b>{{ playerInfo.location }}</b></td></tr>
@@ -98,7 +101,7 @@
                             {% else %}
                                 <tr>
                                     <td colspan="2"><i class="mdi mdi-alert-decagram" style="color:#FFA000; font-size:28px;"></i>
-                                        <span style="position:relative; top:-4px; margin-left:10px;">This player has not visited this server. <br><b class="text-danger">If you see this message, then the integrity of your database has been violated. Please reinstall Trackr after clearing the database from the previous installation.</b></span>
+                                        <span style="position:relative; top:-4px; margin-left:10px;">This player has not visited specified server.</b></span>
                                     </td>
                                 </tr>
                             {% endif %}
